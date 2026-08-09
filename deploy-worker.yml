@@ -1,0 +1,42 @@
+name: Deploy Worker
+
+# Yeh workflow Cloudflare Worker ko khud deploy karta hai — aapke laptop per Node/npm/wrangler
+# install karne ki zaroorat NAHI. Bas GitHub Secrets set karein (README dekhein) aur
+# ya to code push karein, ya "Run workflow" button se manually trigger karein.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "worker/**"
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: worker
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Deploy to Cloudflare Workers
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npx wrangler deploy
+
+      - name: Set Worker secrets (GROQ_API_KEY, INTERNAL_SECRET)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          echo "${{ secrets.GROQ_API_KEY }}" | npx wrangler secret put GROQ_API_KEY
+          echo "${{ secrets.INTERNAL_SECRET }}" | npx wrangler secret put INTERNAL_SECRET

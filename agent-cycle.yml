@@ -1,0 +1,39 @@
+name: Agent Swarm Cycle
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"   # har 30 minute mein khud chalega
+  workflow_dispatch: {}       # manually bhi "Run workflow" button se chala sakte hain
+
+permissions:
+  contents: write   # taake agents.json commit ho sake
+
+jobs:
+  run-brain:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r brain/requirements.txt
+
+      - name: Run brain cycle
+        working-directory: brain
+        env:
+          WORKER_URL: ${{ secrets.WORKER_URL }}
+          INTERNAL_SECRET: ${{ secrets.INTERNAL_SECRET }}
+        run: python brain.py
+
+      - name: Commit updated ledger (agar state badli ho)
+        run: |
+          git config user.name "agent-swarm-bot"
+          git config user.email "actions@github.com"
+          git add brain/agents.json
+          git diff --cached --quiet || git commit -m "Auto-update agent ledger [skip ci]"
+          git push

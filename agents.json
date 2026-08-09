@@ -1,0 +1,45 @@
+{
+  "agents": [
+    {
+      "id": "1",
+      "service": "jobpack",
+      "lifetime_earnings": 0.0,
+      "earnings_at_last_spawn_check": 0.0,
+      "alive": true,
+      "registered": false
+    },
+    {
+      "id": "2",
+      "service": "listing",
+      "lifetime_earnings": 0.0,
+      "earnings_at_last_spawn_check": 0.0,
+      "alive": true,
+      "registered": false
+    },
+    {
+      "id": "3",
+      "service": "social",
+      "lifetime_earnings": 0.0,
+      "earnings_at_last_spawn_check": 0.0,
+      "alive": true,
+      "registered": false
+    },
+    {
+      "id": "4",
+      "service": "pitch",
+      "lifetime_earnings": 0.0,
+      "earnings_at_last_spawn_check": 0.0,
+      "alive": true,
+      "registered": false
+    },
+    {
+      "id": "5",
+      "service": "jobpack",
+      "lifetime_earnings": 0.0,
+      "earnings_at_last_spawn_check": 0.0,
+      "alive": true,
+      "registered": false
+    }
+  ],
+  "next_service_index": 5
+}

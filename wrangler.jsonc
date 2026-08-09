@@ -1,0 +1,28 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "agent-swarm-worker",
+  "main": "src/index.js",
+  "compatibility_date": "2026-02-23",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Yeh vars public hote hain (secret nahi) — code mein visible rehte hain
+  "vars": {
+    "SERVER_WALLET_ADDRESS": "0x724e1Bc7c0548E546483f4b57b7EdD2Eb702E1fc",
+    "FACILITATOR_URL": "https://x402.org/facilitator",
+    "X402_NETWORK": "eip155:84532"
+    // Testing: eip155:84532 (base-sepolia, free test USDC)
+    // Production: eip155:8453 (Base mainnet, real USDC)
+  },
+
+  // GROQ_API_KEY aur INTERNAL_SECRET yahan MAT likhein — yeh secrets hain.
+  // Terminal mein chalayein (README mein steps hain):
+  //   wrangler secret put GROQ_API_KEY
+  //   wrangler secret put INTERNAL_SECRET
+
+  "kv_namespaces": [
+    {
+      "binding": "LEDGER_KV",
+      "id": "YOUR_KV_NAMESPACE_ID_HERE"
+    }
+  ]
+}
