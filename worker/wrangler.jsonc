@@ -22,7 +22,7 @@
   "kv_namespaces": [
     {
       "binding": "LEDGER_KV",
-      "id": "YOUR_KV_NAMESPACE_ID_HERE"
+      "id":"d73a434699c1447fa99f39d32a308586"
     }
   ]
 }
