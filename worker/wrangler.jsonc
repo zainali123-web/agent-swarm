@@ -9,7 +9,7 @@
   "vars": {
     "SERVER_WALLET_ADDRESS": "0x724e1Bc7c0548E546483f4b57b7EdD2Eb702E1fc",
     "FACILITATOR_URL": "https://x402.org/facilitator",
-    "X402_NETWORK": "eip155:84532"
+    "X402_NETWORK": "eip155:8453"
     // Testing: eip155:84532 (base-sepolia, free test USDC)
     // Production: eip155:8453 (Base mainnet, real USDC)
   },
