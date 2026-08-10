@@ -9,8 +9,13 @@
 import { Hono } from "hono";
 import { paymentMiddleware } from "@x402/hono";
 import { SERVICES } from "./services.js";
+import { registerShopRoutes } from "./shop.js";
 
 const app = new Hono();
+
+// ---- Insaanon (real buyers) ke liye shop, checkout, order-tracking, aur
+// Pinterest pin-image routes yahan register hote hain ----
+registerShopRoutes(app);
 
 // ---- Health check (free, no payment needed) ----
 app.get("/", (c) =>
