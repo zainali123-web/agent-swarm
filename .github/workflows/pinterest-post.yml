@@ -1,0 +1,35 @@
+name: Pinterest Marketing
+
+# Har din 6 services (jobpack, listing, social, pitch, resume, linkedin) ka 1-1 fresh
+# pin post karta hai (= 6/din total) — Pinterest ki 2026 safe-range guidelines (5-15/din)
+# ke andar, taake naya account spam filter se flag na ho. Koi manual kaam nahi.
+
+on:
+  schedule:
+    - cron: "0 10 * * *"   # har din 10:00 UTC per
+  workflow_dispatch: {}
+
+jobs:
+  post-pins:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Post Pinterest pins
+        working-directory: brain
+        env:
+          POSTPEER_API_KEY: ${{ secrets.POSTPEER_API_KEY }}
+          POSTPEER_ACCOUNT_ID: ${{ secrets.POSTPEER_ACCOUNT_ID }}
+          POSTPEER_BOARD_ID: ${{ secrets.POSTPEER_BOARD_ID }}
+          SHOP_URL: ${{ secrets.WORKER_URL }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: python pinterest.py
