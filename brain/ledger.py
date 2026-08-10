@@ -14,10 +14,10 @@ import tempfile
 LEDGER_PATH = os.path.join(os.path.dirname(__file__), "agents.json")
 
 # Worker (services.js) mein jo order hai, yahan bilkul wahi order hona chahiye
-SERVICE_ORDER = ["jobpack", "listing", "social", "pitch"]
+SERVICE_ORDER = ["jobpack", "listing", "social", "pitch", "resume", "linkedin", "speech", "script", "email", "bio"]
 
 MAX_AGENTS = 60
-STARTING_AGENTS = 5
+STARTING_AGENTS = 10
 INITIAL_BALANCE = 5.0
 SPAWN_THRESHOLD = 10.0  # itna profit hone per naya agent spawn hoga
 
