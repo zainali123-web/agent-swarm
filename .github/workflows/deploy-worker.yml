@@ -34,9 +34,11 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: npx wrangler deploy
 
-      - name: Set Worker secrets (GROQ_API_KEY, INTERNAL_SECRET)
+      - name: Set Worker secrets (GROQ_API_KEY, INTERNAL_SECRET, NOWPAYMENTS)
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           echo "${{ secrets.GROQ_API_KEY }}" | npx wrangler secret put GROQ_API_KEY
           echo "${{ secrets.INTERNAL_SECRET }}" | npx wrangler secret put INTERNAL_SECRET
+          echo "${{ secrets.NOWPAYMENTS_API_KEY }}" | npx wrangler secret put NOWPAYMENTS_API_KEY
+          echo "${{ secrets.NOWPAYMENTS_IPN_SECRET }}" | npx wrangler secret put NOWPAYMENTS_IPN_SECRET
