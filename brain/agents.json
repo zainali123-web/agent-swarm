@@ -34,12 +34,52 @@
     },
     {
       "id": "5",
-      "service": "jobpack",
+      "service": "resume",
+      "lifetime_earnings": 0.0,
+      "earnings_at_last_spawn_check": 0.0,
+      "alive": true,
+      "registered": false
+    },
+    {
+      "id": "6",
+      "service": "linkedin",
+      "lifetime_earnings": 0.0,
+      "earnings_at_last_spawn_check": 0.0,
+      "alive": true,
+      "registered": false
+    },
+    {
+      "id": "7",
+      "service": "speech",
+      "lifetime_earnings": 0.0,
+      "earnings_at_last_spawn_check": 0.0,
+      "alive": true,
+      "registered": false
+    },
+    {
+      "id": "8",
+      "service": "script",
+      "lifetime_earnings": 0.0,
+      "earnings_at_last_spawn_check": 0.0,
+      "alive": true,
+      "registered": false
+    },
+    {
+      "id": "9",
+      "service": "email",
+      "lifetime_earnings": 0.0,
+      "earnings_at_last_spawn_check": 0.0,
+      "alive": true,
+      "registered": false
+    },
+    {
+      "id": "10",
+      "service": "bio",
       "lifetime_earnings": 0.0,
       "earnings_at_last_spawn_check": 0.0,
       "alive": true,
       "registered": false
     }
   ],
-  "next_service_index": 5
+  "next_service_index": 10
 }
