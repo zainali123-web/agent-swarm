@@ -38,6 +38,12 @@ SERVICE_LABELS = {
     "listing": "AI E-commerce Listing Writer",
     "social": "AI Social Media Content Pack (7-day captions)",
     "pitch": "AI Business One-Pager Generator",
+    "resume": "AI Resume Rewriter",
+    "linkedin": "AI LinkedIn Profile Optimizer",
+    "speech": "AI Wedding/Event Speech Writer",
+    "script": "AI YouTube Script Writer",
+    "email": "AI Email Sequence Writer",
+    "bio": "AI Personal Bio Writer",
 }
 
 
