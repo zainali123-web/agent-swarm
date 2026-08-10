@@ -10,7 +10,8 @@
     "hono": "^4.6.0",
     "@x402/hono": "latest",
     "@x402/evm": "latest",
-    "@x402/core": "latest"
+    "@x402/core": "latest",
+    "workers-og": "^0.0.25"
   },
   "devDependencies": {
     "wrangler": "^3.90.0"
