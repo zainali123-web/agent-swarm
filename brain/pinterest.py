@@ -17,6 +17,7 @@ ENV VARS chahiye (GitHub Actions secrets se aate hain):
 
 import os
 import sys
+import random
 import datetime
 import requests
 
@@ -50,6 +51,9 @@ SERVICES = {
 }
 
 
+EMOJIS = ["✨", "🚀", "💡", "🔥", "📌", "⭐", "🎯", "💬", "🌟", "👇", "🙌", "✅"]
+
+
 def generate_caption(topic, link):
     """Groq se ek chhota, engaging Pinterest caption banata hai (link included)."""
     prompt = (
@@ -69,7 +73,10 @@ def generate_caption(topic, link):
     )
     resp.raise_for_status()
     caption = resp.json()["choices"][0]["message"]["content"].strip()
-    return f"{caption} {link}"
+    # Random emoji guarantee karta hai ke text kabhi bhi purane/deleted post se
+    # byte-for-byte match na kare — Buffer ka duplicate-detection isay bypass kar
+    # deta hai (Groq ki apni randomness per akela depend nahi karte)
+    return f"{random.choice(EMOJIS)} {caption} {link}"
 
 
 def post_pin(service_key, meta):
