@@ -17,6 +17,7 @@ ENV VARS chahiye (GitHub Actions secrets se aate hain):
 
 import os
 import sys
+import datetime
 import requests
 
 BUFFER_API_KEY = os.environ.get("BUFFER_API_KEY", "")
@@ -74,7 +75,10 @@ def generate_caption(topic, link):
 def post_pin(service_key, meta):
     link = f"{SHOP_URL}/shop/{service_key}"
     caption = generate_caption(meta["topic"], link)
-    image_url = f"{SHOP_URL}/pin-image/{service_key}"
+    # Date query-param jodne se URL har din unique ban jata hai — Buffer ka duplicate
+    # detection isay purane (delete ho chuke) post se "alag" samajhta hai
+    today = datetime.date.today().isoformat()
+    image_url = f"{SHOP_URL}/pin-image/{service_key}?v={today}"
 
     query = """
     mutation CreatePin($channelId: ChannelId!, $text: String!, $imageUrl: String!, $board: String!) {
