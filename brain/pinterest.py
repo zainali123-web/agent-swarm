@@ -21,6 +21,7 @@ import requests
 
 BUFFER_API_KEY = os.environ.get("BUFFER_API_KEY", "")
 BUFFER_CHANNEL_ID = os.environ.get("BUFFER_CHANNEL_ID", "")
+BUFFER_BOARD_NAME = os.environ.get("BUFFER_BOARD_NAME", "AI Tools & Templates")
 SHOP_URL = os.environ.get("SHOP_URL", "").rstrip("/")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
@@ -76,12 +77,13 @@ def post_pin(service_key, meta):
     image_url = f"{SHOP_URL}/pin-image/{service_key}"
 
     query = """
-    mutation CreatePin($channelId: ChannelId!, $text: String!, $imageUrl: String!) {
+    mutation CreatePin($channelId: ChannelId!, $text: String!, $imageUrl: String!, $board: String!) {
       createPost(input: {
         text: $text,
         channelId: $channelId,
         schedulingType: automatic,
         mode: addToQueue,
+        metadata: { pinterest: { board: $board } },
         assets: [{ image: { url: $imageUrl } }]
       }) {
         ... on PostActionSuccess { post { id text dueAt } }
@@ -94,7 +96,12 @@ def post_pin(service_key, meta):
         headers={"Content-Type": "application/json", "Authorization": f"Bearer {BUFFER_API_KEY}"},
         json={
             "query": query,
-            "variables": {"channelId": BUFFER_CHANNEL_ID, "text": caption, "imageUrl": image_url},
+            "variables": {
+                "channelId": BUFFER_CHANNEL_ID,
+                "text": caption,
+                "imageUrl": image_url,
+                "board": BUFFER_BOARD_NAME,
+            },
         },
         timeout=30,
     )
