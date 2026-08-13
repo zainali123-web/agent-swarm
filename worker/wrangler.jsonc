@@ -9,20 +9,20 @@
   "vars": {
     "SERVER_WALLET_ADDRESS": "0x724e1Bc7c0548E546483f4b57b7EdD2Eb702E1fc",
     "FACILITATOR_URL": "https://x402.org/facilitator",
-    "X402_NETWORK": "eip155:8453"
+    "X402_NETWORK": "eip155:8453",
+    "PINTEREST_VERIFY_CODE": "42b5f93db6404528abbe8193e8554de3"
     // Testing: eip155:84532 (base-sepolia, free test USDC)
-    // Production: eip155:8453 (Base mainnet, real USDC)
+    // Production: eip155:8453 (Base mainnet, real USDC) — ABHI YEH ACTIVE HAI
   },
 
-  // GROQ_API_KEY aur INTERNAL_SECRET yahan MAT likhein — yeh secrets hain.
-  // Terminal mein chalayein (README mein steps hain):
-  //   wrangler secret put GROQ_API_KEY
-  //   wrangler secret put INTERNAL_SECRET
+  // Yeh 4 secrets yahan MAT likhein — sensitive hain, wrangler secret put se set hote
+  // hain (deploy-worker.yml khud kar deta hai GitHub Secrets se):
+  //   GROQ_API_KEY, INTERNAL_SECRET, NOWPAYMENTS_API_KEY, NOWPAYMENTS_IPN_SECRET
 
   "kv_namespaces": [
     {
       "binding": "LEDGER_KV",
-      "id":"d73a434699c1447fa99f39d32a308586"
+      "id": "d73a434699c1447fa99f39d32a308586"
     }
   ]
 }
