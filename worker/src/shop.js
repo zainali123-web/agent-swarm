@@ -74,7 +74,7 @@ const MARKETING_COPY = {
   },
 };
 
-function pageShell({ title, description, keywords, canonical, bodyHtml, jsonLd }) {
+function pageShell({ title, description, keywords, canonical, bodyHtml, jsonLd, ogImage, price, pinterestVerify }) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -85,7 +85,14 @@ function pageShell({ title, description, keywords, canonical, bodyHtml, jsonLd }
 <meta name="keywords" content="${keywords}">
 <meta property="og:title" content="${title}">
 <meta property="og:description" content="${description}">
-<meta property="og:type" content="website">
+<meta property="og:type" content="${price ? "product" : "website"}">
+${ogImage ? `<meta property="og:image" content="${ogImage}">` : ""}
+${price ? `<meta property="product:price:amount" content="${price}">
+<meta property="product:price:currency" content="USD">
+<meta property="og:price:amount" content="${price}">
+<meta property="og:price:currency" content="USD">
+<meta property="og:availability" content="instock">` : ""}
+${pinterestVerify ? `<meta name="p:domain_verify" content="${pinterestVerify}">` : ""}
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="${canonical}">
 ${jsonLd ? `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>` : ""}
@@ -135,7 +142,7 @@ function checkoutScript(service) {
   </script>`;
 }
 
-function renderIndexPage(baseUrl) {
+function renderIndexPage(baseUrl, pinterestVerify) {
   const cards = Object.entries(SERVICES)
     .map(([key, s]) => {
       const m = MARKETING_COPY[key];
@@ -144,6 +151,7 @@ function renderIndexPage(baseUrl) {
         <h2><a href="/shop/${key}">${m.headline}</a></h2>
         <p class="desc">${s.description.split(" Body:")[0]}</p>
         <p class="price">${s.price}</p>
+        <p style="font-size:0.78rem;color:#888;margin-top:-6px;">Crypto payments only (pay with any coin — or buy instantly with your card via MoonPay)</p>
         <a href="/shop/${key}"><button type="button">View & Buy</button></a>
       </div>`;
     })
@@ -154,13 +162,15 @@ function renderIndexPage(baseUrl) {
     description: "Instant AI-powered documents — cover letters, resumes, product listings, social content, LinkedIn profiles & business pitches, delivered in seconds. Pay with crypto.",
     keywords: "AI cover letter, AI resume, AI product listing, AI LinkedIn profile, AI business pitch, pay with crypto",
     canonical: `${baseUrl}/shop`,
+    pinterestVerify,
     bodyHtml: `<h1>${SITE_NAME}</h1>
     <p class="tagline">Instant AI-powered documents. Pay with crypto — no account needed.</p>
+    <p style="font-size:0.85rem;color:#666;">New to crypto? You can buy a small amount instantly with your card via <a href="https://www.moonpay.com/buy" target="_blank" rel="noopener">MoonPay</a>.</p>
     ${cards}`,
   });
 }
 
-function renderServicePage(baseUrl, key) {
+function renderServicePage(baseUrl, key, pinterestVerify) {
   const s = SERVICES[key];
   const m = MARKETING_COPY[key];
   if (!s || !m) return null;
@@ -184,11 +194,25 @@ function renderServicePage(baseUrl, key) {
     <h1>${m.headline}</h1>
     <p class="desc">${s.description.split(" Body:")[0]}</p>
     <p class="price">${s.price}</p>
-    <form id="buy-form">
+    <p style="font-size:0.78rem;color:#888;margin-top:-6px;">💰 Crypto payments — any coin accepted</p>
+    <div style="font-size:0.85rem;color:#555;margin-top:12px;background:#f5f7f5;border-radius:8px;padding:14px;line-height:1.6;">
+      <strong>Don't have crypto? How to pay with your card (legal, 2 minutes):</strong>
+      <ol style="margin:6px 0 0 18px;padding:0;">
+        <li>Open <a href="https://www.moonpay.com/buy" target="_blank" rel="noopener">MoonPay</a> (or your wallet app's "Buy" button)</li>
+        <li>Buy a small amount of USDC or SOL with your Visa/Mastercard</li>
+        <li>It lands in your wallet in ~2 minutes</li>
+        <li>Come back here and click "Pay with Crypto" below</li>
+      </ol>
+    </div>
+    <form id="buy-form" style="margin-top:16px;">
       <textarea name="input" placeholder="Paste your details here..." required></textarea>
       <button type="submit">Pay with Crypto — ${s.price}</button>
     </form>
     <div class="status" id="status"></div>
+    <p style="font-size:0.85rem;color:#555;margin-top:20px;line-height:1.5;">
+      ${m.metaDesc} Trusted by freelancers, small business owners, and job seekers
+      who want a professional result without the wait or the high freelancer fees.
+    </p>
   </div>
   ${checkoutScript(key)}`;
 
@@ -196,7 +220,10 @@ function renderServicePage(baseUrl, key) {
     title: m.metaTitle,
     description: m.metaDesc,
     keywords: m.keywords,
+    price: s.price.replace("$", ""),
+    ogImage: `${baseUrl}/pin-image/${key}`,
     canonical: `${baseUrl}/shop/${key}`,
+    pinterestVerify,
     bodyHtml,
     jsonLd,
   });
@@ -253,13 +280,13 @@ export function registerShopRoutes(app) {
   // Index page — sab services list karta hai
   app.get("/shop", (c) => {
     const baseUrl = new URL(c.req.url).origin;
-    return c.html(renderIndexPage(baseUrl));
+    return c.html(renderIndexPage(baseUrl, c.env.PINTEREST_VERIFY_CODE));
   });
 
   // Har service ki apni alag SEO page — behtar Google ranking ke liye
   app.get("/shop/:service", (c) => {
     const baseUrl = new URL(c.req.url).origin;
-    const html = renderServicePage(baseUrl, c.req.param("service"));
+    const html = renderServicePage(baseUrl, c.req.param("service"), c.env.PINTEREST_VERIFY_CODE);
     if (!html) return c.text("Service not found", 404);
     return c.html(html);
   });
@@ -376,6 +403,17 @@ export function registerShopRoutes(app) {
     const s = SERVICES[service];
     if (!m || !s) return c.text("not found", 404);
 
+    // Har din thodi variation (fresh pin design signal Pinterest ke liye) — 4 color
+    // schemes rotate hote hain date ke hisaab se
+    const GRADIENTS = [
+      "linear-gradient(135deg, #16794b, #0c4a2c)",
+      "linear-gradient(135deg, #1d4ed8, #0b1f6b)",
+      "linear-gradient(135deg, #b91c1c, #5c0e0e)",
+      "linear-gradient(135deg, #7c3aed, #3b0f8c)",
+    ];
+    const dayIndex = new Date().getDate() % GRADIENTS.length;
+    const background = GRADIENTS[dayIndex];
+
     return new ImageResponse(
       {
         type: "div",
@@ -387,7 +425,7 @@ export function registerShopRoutes(app) {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            background: "linear-gradient(135deg, #16794b, #0c4a2c)",
+            background,
             color: "#fff",
             fontFamily: "sans-serif",
             padding: "80px",
@@ -401,9 +439,13 @@ export function registerShopRoutes(app) {
             {
               type: "div",
               props: {
-                style: { fontSize: "48px", marginTop: "80px", background: "#fff", color: "#16794b", padding: "20px 40px", borderRadius: "20px", fontWeight: "bold" },
+                style: { fontSize: "48px", marginTop: "60px", background: "#fff", color: "#16794b", padding: "20px 40px", borderRadius: "20px", fontWeight: "bold" },
                 children: s.price,
               },
+            },
+            {
+              type: "div",
+              props: { style: { fontSize: "28px", marginTop: "30px", opacity: 0.85 }, children: "💰 Crypto payments only" },
             },
           ],
         },
