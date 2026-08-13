@@ -23,9 +23,26 @@ import requests
 
 BUFFER_API_KEY = os.environ.get("BUFFER_API_KEY", "")
 BUFFER_CHANNEL_ID = os.environ.get("BUFFER_CHANNEL_ID", "")
-BUFFER_BOARD_NAME = os.environ.get("BUFFER_BOARD_NAME", "AI Tools & Templates")
 SHOP_URL = os.environ.get("SHOP_URL", "").rstrip("/")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
+
+# Har service ko uske topic ke hisaab se ek alag board per bhejte hain (na ke sab ek
+# generic board mein) — Pinterest SEO research (2026) confirm karti hai ke "jis board
+# mein pehli baar pin jati hai, wahi Pinterest ko batata hai content kis topic ka hai."
+# In 4 boards ko Pinterest/Buffer mein ek dafa manually banana hoga (jaisa
+# "AI Tools & Templates" banaya tha) — bilkul yehi naam se.
+BOARD_MAP = {
+    "jobpack": "Career & Job Search Tools",
+    "resume": "Career & Job Search Tools",
+    "linkedin": "Career & Job Search Tools",
+    "listing": "Business & E-commerce Tools",
+    "pitch": "Business & E-commerce Tools",
+    "email": "Business & E-commerce Tools",
+    "social": "Content Creator Tools",
+    "script": "Content Creator Tools",
+    "bio": "Content Creator Tools",
+    "speech": "Life Events Writing",
+}
 
 SERVICES = {
     "jobpack": {"title": "AI Cover Letter Generator — Job-Winning in 60 Seconds",
@@ -55,10 +72,19 @@ EMOJIS = ["✨", "🚀", "💡", "🔥", "📌", "⭐", "🎯", "💬", "🌟", 
 
 
 def generate_caption(topic, link):
-    """Groq se ek chhota, engaging Pinterest caption banata hai (link included)."""
+    """Groq se ek chhota, engaging Pinterest caption banata hai — crypto-aware audience
+    (freelancers/Web3 users) ko primarily target karta hai, card-users ke liye bhi soft
+    mention karta hai, aur end mein 3-5 relevant hashtags deta hai (Pinterest discovery
+    ke liye zaroori hain)."""
     prompt = (
-        f"Write a short, engaging Pinterest pin description (max 2 sentences, no hashtags) "
-        f"about {topic}. End with a soft call-to-action. Output ONLY the description, nothing else."
+        f"Write a short, engaging Pinterest pin description (max 2 sentences) "
+        f"about {topic}. Frame it for an audience that is comfortable with crypto/Web3 "
+        f"(e.g., freelancers, crypto users) and mention payment is via crypto — but also "
+        f"add a brief, friendly note that even without crypto, you can pay by buying a "
+        f"small amount instantly with a card. End with a soft call-to-action, then on a "
+        f"new line add 4 relevant, professional Pinterest hashtags (e.g. #AITools "
+        f"#Freelancer #SideHustle #CryptoPayments style — pick ones relevant to the topic). "
+        f"Output ONLY the description and hashtags, nothing else."
     )
     resp = requests.post(
         "https://api.groq.com/openai/v1/chat/completions",
@@ -88,13 +114,13 @@ def post_pin(service_key, meta):
     image_url = f"{SHOP_URL}/pin-image/{service_key}?v={today}"
 
     query = """
-    mutation CreatePin($channelId: ChannelId!, $text: String!, $imageUrl: String!, $board: String!) {
+    mutation CreatePin($channelId: ChannelId!, $text: String!, $imageUrl: String!, $board: String!, $title: String!, $link: String!) {
       createPost(input: {
         text: $text,
         channelId: $channelId,
         schedulingType: automatic,
         mode: addToQueue,
-        metadata: { pinterest: { board: $board } },
+        metadata: { pinterest: { board: $board, title: $title, url: $link } },
         assets: [{ image: { url: $imageUrl } }]
       }) {
         ... on PostActionSuccess { post { id text dueAt } }
@@ -111,7 +137,9 @@ def post_pin(service_key, meta):
                 "channelId": BUFFER_CHANNEL_ID,
                 "text": caption,
                 "imageUrl": image_url,
-                "board": BUFFER_BOARD_NAME,
+                "board": BOARD_MAP.get(service_key, "AI Tools & Templates"),
+                "title": meta["title"][:100],  # Pinterest title max ~100 chars, keyword-rich front matters most
+                "link": link,
             },
         },
         timeout=30,
@@ -120,9 +148,19 @@ def post_pin(service_key, meta):
         print(f"[{service_key}] Pinterest post FAILED (HTTP {resp.status_code}): {resp.text}")
         return False
     data = resp.json()
-    result = data.get("data", {}).get("createPost", {})
+
+    # Top-level GraphQL errors (jaise galat field/schema) — pehle yeh check karo,
+    # warna yeh silently miss ho kar false "success" dikha sakta hai
+    if data.get("errors"):
+        print(f"[{service_key}] GraphQL error: {data['errors']}")
+        return False
+
+    result = data.get("data", {}).get("createPost", {}) if data.get("data") else {}
     if result.get("message"):
         print(f"[{service_key}] Buffer error: {result['message']}")
+        return False
+    if not result:
+        print(f"[{service_key}] Unexpected empty response: {data}")
         return False
     print(f"[{service_key}] Pin queued -> {link}")
     return True
