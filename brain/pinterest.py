@@ -29,19 +29,20 @@ GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 # Har service ko uske topic ke hisaab se ek alag board per bhejte hain (na ke sab ek
 # generic board mein) — Pinterest SEO research (2026) confirm karti hai ke "jis board
 # mein pehli baar pin jati hai, wahi Pinterest ko batata hai content kis topic ka hai."
-# In 4 boards ko Pinterest/Buffer mein ek dafa manually banana hoga (jaisa
-# "AI Tools & Templates" banaya tha) — bilkul yehi naam se.
+# Buffer API ko board ka NAAM nahi, uski serviceId chahiye — neeche placeholder hain,
+# asal IDs Buffer API Explorer se nikal kar yahan daalni hain (README/chat mein
+# instructions hain).
 BOARD_MAP = {
-    "jobpack": "Career & Job Search Tools",
-    "resume": "Career & Job Search Tools",
-    "linkedin": "Career & Job Search Tools",
-    "listing": "Business & E-commerce Tools",
-    "pitch": "Business & E-commerce Tools",
-    "email": "Business & E-commerce Tools",
-    "social": "Content Creator Tools",
-    "script": "Content Creator Tools",
-    "bio": "Content Creator Tools",
-    "speech": "Life Events Writing",
+    "jobpack": "1086915760009703916",   # Career & Job Search Tools
+    "resume": "1086915760009703916",    # Career & Job Search Tools
+    "linkedin": "1086915760009703916",  # Career & Job Search Tools
+    "listing": "1086915760009703917",   # Business & E-commerce Tools
+    "pitch": "1086915760009703917",     # Business & E-commerce Tools
+    "email": "1086915760009703917",     # Business & E-commerce Tools
+    "social": "1086915760009703919",    # Content Creator Tools
+    "script": "1086915760009703919",    # Content Creator Tools
+    "bio": "1086915760009703919",       # Content Creator Tools
+    "speech": "1086915760009703920",    # Life Events Writing
 }
 
 SERVICES = {
@@ -114,13 +115,13 @@ def post_pin(service_key, meta):
     image_url = f"{SHOP_URL}/pin-image/{service_key}?v={today}"
 
     query = """
-    mutation CreatePin($channelId: ChannelId!, $text: String!, $imageUrl: String!, $board: String!, $title: String!, $link: String!) {
+    mutation CreatePin($channelId: ChannelId!, $text: String!, $imageUrl: String!, $boardServiceId: String!, $title: String!, $link: String!) {
       createPost(input: {
         text: $text,
         channelId: $channelId,
         schedulingType: automatic,
         mode: addToQueue,
-        metadata: { pinterest: { board: $board, title: $title, url: $link } },
+        metadata: { pinterest: { boardServiceId: $boardServiceId, title: $title, url: $link } },
         assets: [{ image: { url: $imageUrl } }]
       }) {
         ... on PostActionSuccess { post { id text dueAt } }
@@ -137,7 +138,7 @@ def post_pin(service_key, meta):
                 "channelId": BUFFER_CHANNEL_ID,
                 "text": caption,
                 "imageUrl": image_url,
-                "board": BOARD_MAP.get(service_key, "AI Tools & Templates"),
+                "boardServiceId": BOARD_MAP.get(service_key, ""),
                 "title": meta["title"][:100],  # Pinterest title max ~100 chars, keyword-rich front matters most
                 "link": link,
             },
