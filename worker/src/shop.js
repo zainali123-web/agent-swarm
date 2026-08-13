@@ -282,6 +282,11 @@ export function registerShopRoutes(app) {
     const baseUrl = new URL(c.req.url).origin;
     return c.html(renderIndexPage(baseUrl, c.env.PINTEREST_VERIFY_CODE));
   });
+  // Trailing-slash version bhi register karo — Pinterest verification isay maangta hai
+  app.get("/shop/", (c) => {
+    const baseUrl = new URL(c.req.url).origin;
+    return c.html(renderIndexPage(baseUrl, c.env.PINTEREST_VERIFY_CODE));
+  });
 
   // Har service ki apni alag SEO page — behtar Google ranking ke liye
   app.get("/shop/:service", (c) => {
