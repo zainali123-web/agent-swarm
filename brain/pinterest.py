@@ -103,7 +103,13 @@ def generate_caption(topic, link):
     # Random emoji guarantee karta hai ke text kabhi bhi purane/deleted post se
     # byte-for-byte match na kare — Buffer ka duplicate-detection isay bypass kar
     # deta hai (Groq ki apni randomness per akela depend nahi karte)
-    return f"{random.choice(EMOJIS)} {caption} {link}"
+    full = f"{random.choice(EMOJIS)} {caption} {link}"
+    # Pinterest ki 500-character hard limit — Groq kabhi zyada likh deta hai (khaas kar
+    # 4 hashtags ke saath), isliye safe margin (480) per truncate karte hain
+    if len(full) > 480:
+        max_caption_len = 480 - len(link) - 4  # emoji + spaces ke liye margin
+        full = f"{random.choice(EMOJIS)} {caption[:max_caption_len].rsplit(' ', 1)[0]}... {link}"
+    return full
 
 
 def post_pin(service_key, meta):
