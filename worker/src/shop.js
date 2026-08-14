@@ -452,6 +452,28 @@ export function registerShopRoutes(app) {
               type: "div",
               props: { style: { fontSize: "28px", marginTop: "30px", opacity: 0.85 }, children: "💰 Crypto payments only" },
             },
+            {
+              type: "div",
+              props: {
+                style: {
+                  fontSize: "24px",
+                  marginTop: "70px",
+                  background: "rgba(255,255,255,0.12)",
+                  borderRadius: "16px",
+                  padding: "30px 36px",
+                  textAlign: "left",
+                  lineHeight: 1.7,
+                  maxWidth: "820px",
+                },
+                children: [
+                  { type: "div", props: { style: { fontWeight: "bold", marginBottom: "10px" }, children: "💳 No crypto? Pay with card:" } },
+                  { type: "div", props: { children: "1. Open MoonPay app or site" } },
+                  { type: "div", props: { children: "2. Buy a small amount of USDC/SOL" } },
+                  { type: "div", props: { children: "3. It lands in your wallet in ~2 min" } },
+                  { type: "div", props: { children: "4. Come back & pay with it here" } },
+                ],
+              },
+            },
           ],
         },
       },
