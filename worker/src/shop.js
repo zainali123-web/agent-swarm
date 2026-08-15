@@ -408,16 +408,17 @@ export function registerShopRoutes(app) {
     const s = SERVICES[service];
     if (!m || !s) return c.text("not found", 404);
 
-    // Har din thodi variation (fresh pin design signal Pinterest ke liye) — 4 color
-    // schemes rotate hote hain date ke hisaab se
+    // Har service ko fix color milta hai (na ke date ke hisaab se) — 10 services, 4
+    // colors cycle karte hain (5th service phir se pehle color per wapis aa jata hai)
+    const SERVICE_ORDER = ["jobpack", "listing", "social", "pitch", "resume", "linkedin", "speech", "script", "email", "bio"];
     const GRADIENTS = [
       "linear-gradient(135deg, #16794b, #0c4a2c)",
       "linear-gradient(135deg, #1d4ed8, #0b1f6b)",
       "linear-gradient(135deg, #b91c1c, #5c0e0e)",
       "linear-gradient(135deg, #7c3aed, #3b0f8c)",
     ];
-    const dayIndex = new Date().getDate() % GRADIENTS.length;
-    const background = GRADIENTS[dayIndex];
+    const serviceIndex = SERVICE_ORDER.indexOf(service);
+    const background = GRADIENTS[(serviceIndex >= 0 ? serviceIndex : 0) % GRADIENTS.length];
 
     return new ImageResponse(
       {
@@ -464,6 +465,8 @@ export function registerShopRoutes(app) {
                   textAlign: "left",
                   lineHeight: 1.7,
                   maxWidth: "820px",
+                  display: "flex",
+                  flexDirection: "column",
                 },
                 children: [
                   { type: "div", props: { style: { fontWeight: "bold", marginBottom: "10px" }, children: "💳 No crypto? Pay with card:" } },
