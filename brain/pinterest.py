@@ -91,7 +91,7 @@ def generate_caption(topic, link):
         "https://api.groq.com/openai/v1/chat/completions",
         headers={"Content-Type": "application/json", "Authorization": f"Bearer {GROQ_API_KEY}"},
         json={
-            "model": "llama-3.3-70b-versatile",
+            "model": "openai/gpt-oss-120b",
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.7,
             "max_tokens": 100,
